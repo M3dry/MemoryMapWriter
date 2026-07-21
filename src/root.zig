@@ -37,8 +37,8 @@ pub const MemoryMapWriter = struct {
         return self.mm.memory[0..self.writer.end];
     }
 
-    pub fn seekTo(self: *MemoryMapWriter, pos: usize) error{SeekBeyondEnd}!void {
-        if (pos > self.writer.buffer.len) return error.SeekBeyondEnd;
+    pub fn seekTo(self: *MemoryMapWriter, pos: usize) error{SeekBeyondBufferEnd}!void {
+        if (pos > self.writer.buffer.len) return error.SeekBeyondBufferEnd;
         self.writer.end = pos;
     }
 
@@ -47,6 +47,7 @@ pub const MemoryMapWriter = struct {
             try self.grow(n);
     }
 
+    /// syncs buffer to file, and resizes file to buffer length
     pub fn truncate(self: *MemoryMapWriter) std.Io.Writer.Error!void {
         try self.writer.flush();
         self.file.setLength(self.io, self.writer.end) catch return error.WriteFailed;
